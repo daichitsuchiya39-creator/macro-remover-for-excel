@@ -3,9 +3,10 @@ import sys
 import tempfile
 import threading
 
-from flask import Flask, render_template, request, send_file, flash, redirect, jsonify
+from flask import Flask, render_template, request, send_file, flash, redirect, jsonify, make_response
 import openpyxl
 from werkzeug.utils import secure_filename
+from urllib.parse import quote
 
 
 def get_resource_path(relative_path):
@@ -71,12 +72,15 @@ def index():
 
             remove_macro(input_path, output_path)
 
-            return send_file(
+            response = make_response(send_file(
                 output_path,
-                as_attachment=True,
-                download_name=output_filename,
                 mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+            ))
+            # 日本語ファイル名対応: RFC 5987形式でエンコード
+            encoded_filename = quote(output_filename)
+            response.headers['Content-Disposition'] = \
+                f"attachment; filename*=UTF-8''{encoded_filename}"
+            return response
         except Exception as e:
             flash(f'処理中にエラーが発生しました: {str(e)}', 'error')
             return redirect(request.url)
@@ -112,12 +116,15 @@ def api_remove_macro():
 
         remove_macro(input_path, output_path)
 
-        return send_file(
+        response = make_response(send_file(
             output_path,
-            as_attachment=True,
-            download_name=output_filename,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        ))
+        # 日本語ファイル名対応: RFC 5987形式でエンコード
+        encoded_filename = quote(output_filename)
+        response.headers['Content-Disposition'] = \
+            f"attachment; filename*=UTF-8''{encoded_filename}"
+        return response
     except Exception as e:
         return jsonify({'error': f'処理中にエラーが発生しました: {str(e)}'}), 500
 
