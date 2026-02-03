@@ -63,10 +63,11 @@ def index():
         file.save(input_path)
 
         try:
-            # 出力ファイル名: 元のファイル名の拡張子を.xlsxに変更
-            base_name = os.path.splitext(input_filename)[0]
-            output_filename = f"{base_name}.xlsx"
-            output_path = os.path.join(temp_dir, output_filename)
+            # 出力ファイル名: 元のファイル名 + (マクロ除去済).xlsx
+            original_base_name = os.path.splitext(file.filename)[0]
+            output_filename = f"{original_base_name}(マクロ除去済).xlsx"
+            safe_output_filename = f"{os.path.splitext(input_filename)[0]}.xlsx"
+            output_path = os.path.join(temp_dir, safe_output_filename)
 
             remove_macro(input_path, output_path)
 
@@ -103,9 +104,11 @@ def api_remove_macro():
     file.save(input_path)
 
     try:
-        base_name = os.path.splitext(input_filename)[0]
-        output_filename = f"{base_name}.xlsx"
-        output_path = os.path.join(temp_dir, output_filename)
+        # 出力ファイル名: 元のファイル名 + (マクロ除去済).xlsx
+        original_base_name = os.path.splitext(file.filename)[0]
+        output_filename = f"{original_base_name}(マクロ除去済).xlsx"
+        safe_output_filename = f"{os.path.splitext(input_filename)[0]}.xlsx"
+        output_path = os.path.join(temp_dir, safe_output_filename)
 
         remove_macro(input_path, output_path)
 

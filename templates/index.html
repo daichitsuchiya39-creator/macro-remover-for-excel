@@ -372,7 +372,8 @@
 
                 // Content-Dispositionからファイル名を取得
                 const contentDisposition = response.headers.get('Content-Disposition');
-                let downloadName = fileInput.files[0].name.replace('.xlsm', '.xlsx');
+                const originalName = fileInput.files[0].name.replace(/\.xlsm$/i, '');
+                let downloadName = `${originalName}(マクロ除去済).xlsx`;
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/i);
                     if (match) {
