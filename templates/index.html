@@ -207,6 +207,20 @@
             font-size: 13px;
             line-height: 1.8;
         }
+        .site-footer {
+            text-align: center;
+            padding: 24px 20px;
+            margin-top: 20px;
+        }
+        .site-footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+        .site-footer a:hover {
+            color: #3b82f6;
+        }
         @media (max-width: 480px) {
             body {
                 padding: 20px 12px;
@@ -267,6 +281,10 @@
             <button type="submit" id="submitBtn" disabled>マクロを除去してダウンロード</button>
         </form>
     </div>
+
+    <footer class="site-footer">
+        <a href="https://chiapuru.com" target="_blank" rel="noopener">chiapuru.com</a>
+    </footer>
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
