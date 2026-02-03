@@ -338,24 +338,82 @@
             }
         }
 
-        // フォーム送信時のローディング表示
-        uploadForm.addEventListener('submit', (e) => {
+        // フォーム送信時のローディング表示（Ajax送信）
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
             if (fileInput.files.length === 0) {
-                e.preventDefault();
                 alert('ファイルを選択してください。');
                 return;
             }
+
             loadingOverlay.classList.add('visible');
             submitBtn.disabled = true;
-        });
 
-        // ページ読み込み完了時にローディングを非表示
-        window.addEventListener('pageshow', () => {
-            loadingOverlay.classList.remove('visible');
-            if (fileInput.files.length > 0) {
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const response = await fetch('/api/remove-macro', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '処理中にエラーが発生しました');
+                }
+
+                // ファイルをダウンロード
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+
+                // Content-Dispositionからファイル名を取得
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let downloadName = fileInput.files[0].name.replace('.xlsm', '.xlsx');
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/i);
+                    if (match) {
+                        downloadName = decodeURIComponent(match[1].replace(/['"]/g, ''));
+                    }
+                }
+
+                a.download = downloadName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                // 成功メッセージ（オプション）
+                showFlash('マクロを除去しました', 'success');
+
+            } catch (error) {
+                showFlash(error.message, 'error');
+            } finally {
+                loadingOverlay.classList.remove('visible');
                 submitBtn.disabled = false;
             }
         });
+
+        // フラッシュメッセージを表示
+        function showFlash(message, type) {
+            const existing = document.querySelector('.flash-messages');
+            if (existing) existing.remove();
+
+            const container = document.querySelector('.container');
+            const description = document.querySelector('.description');
+
+            const flashDiv = document.createElement('div');
+            flashDiv.className = 'flash-messages';
+            flashDiv.innerHTML = `<div class="flash ${type}">${message}</div>`;
+
+            description.after(flashDiv);
+
+            // 5秒後に自動で消す
+            setTimeout(() => flashDiv.remove(), 5000);
+        }
     </script>
 </body>
 </html>
