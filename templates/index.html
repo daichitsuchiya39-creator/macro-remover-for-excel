@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excelマクロ除去ツール</title>
+    <title>Macro Remover</title>
     <style>
         * {
             box-sizing: border-box;
@@ -236,10 +236,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Excelマクロ除去ツール</h1>
+        <h1>Macro Remover</h1>
         <p class="description">
-            マクロ付きExcelファイル（.xlsm）をアップロードすると、<br>
-            マクロを除去した安全な.xlsxファイルとしてダウンロードできます。
+            Upload a macro-enabled workbook file (.xlsm) and<br>
+            download it as a safe .xlsx file with macros removed.
         </p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -253,16 +253,16 @@
         {% endwith %}
 
         <div class="info-box">
-            <h3>対応形式</h3>
+            <h3>Supported Format</h3>
             <ul>
-                <li>.xlsm（マクロ有効ブック）→ .xlsx（マクロなし）</li>
-                <li>書式・レイアウト・数式は完全保持</li>
+                <li>.xlsm (Macro-enabled workbook) → .xlsx (Macro-free)</li>
+                <li>Formatting, layout, and formulas are fully preserved</li>
             </ul>
         </div>
 
         <form method="POST" enctype="multipart/form-data" id="uploadForm">
             <div class="form-group">
-                <label>Excelファイルを選択</label>
+                <label>Select Workbook File</label>
                 <div class="drop-zone" id="dropZone">
                     <input type="file" name="file" id="fileInput" accept=".xlsm" required>
                     <div class="drop-icon" id="dropIcon">
@@ -272,13 +272,13 @@
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                     </div>
-                    <div class="drop-text">ここにファイルをドラッグ&ドロップ</div>
-                    <div class="drop-hint">または クリックしてファイルを選択</div>
+                    <div class="drop-text">Drag & drop file here</div>
+                    <div class="drop-hint">or click to select file</div>
                     <div class="file-name" id="fileName"></div>
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" disabled>マクロを除去してダウンロード</button>
+            <button type="submit" id="submitBtn" disabled>Remove Macro and Download</button>
         </form>
     </div>
 
@@ -288,7 +288,7 @@
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
-        <div class="loading-text">マクロを除去しています...</div>
+        <div class="loading-text">Removing macros...</div>
     </div>
 
     <script>
@@ -338,7 +338,7 @@
         function handleFile(file) {
             // 拡張子チェック
             if (!file.name.toLowerCase().endsWith('.xlsm')) {
-                alert('.xlsm ファイルのみ対応しています。');
+                alert('Only .xlsm files are supported.');
                 fileInput.value = '';
                 return;
             }
@@ -361,7 +361,7 @@
             e.preventDefault();
 
             if (fileInput.files.length === 0) {
-                alert('ファイルを選択してください。');
+                alert('Please select a file.');
                 return;
             }
 
@@ -379,7 +379,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || '処理中にエラーが発生しました');
+                    throw new Error(errorData.error || 'An error occurred during processing');
                 }
 
                 // ファイルをダウンロード
@@ -391,7 +391,7 @@
                 // Content-Dispositionからファイル名を取得
                 const contentDisposition = response.headers.get('Content-Disposition');
                 const originalName = fileInput.files[0].name.replace(/\.xlsm$/i, '');
-                let downloadName = `${originalName}(マクロ除去済).xlsx`;
+                let downloadName = `${originalName}(macro-removed).xlsx`;
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/i);
                     if (match) {
@@ -406,7 +406,7 @@
                 window.URL.revokeObjectURL(url);
 
                 // 成功メッセージ（オプション）
-                showFlash('マクロを除去しました', 'success');
+                showFlash('Macros removed successfully', 'success');
 
             } catch (error) {
                 showFlash(error.message, 'error');
